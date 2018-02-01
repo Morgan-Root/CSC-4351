@@ -117,10 +117,17 @@ StringBuffer string = new StringBuffer();
 <STRING> \\ { yybegin(STRING_IGNORE);}
 
 <STRING_IGNORE> n {string.append("\n"); yybegin(STRING); }
+<STRING_IGNORE> "^"{letters} {string.append((char)(yytext().charAt(1)-'A'+1));yybegin(STRING);}
+<STRING_IGNORE> \\{d}{d}{d} {int a = Integer.parseInt(yytext()); if (a < 128) {string.append((char)a);} else {err("Not in the ASCII code range");} yybegin(STRING);}
 <STRING_IGNORE> t {string.append("\t"); yybegin(STRING); }
 <STRING_IGNORE> \" {string.append("\""); yybegin(STRING); }
 <STRING_IGNORE> \\ {string.append("\\"); yybegin(STRING); }
 <STRING_IGNORE> " "|\t|\f {}
 <STRING_IGNORE> . {err("Unexpected character '" + yytext() + "' after '\\'."); }
+
+<YYINITIAL> {d}+ {return tok(sym.INT, new Integer(yytext()));}
+<YYINITIAL> {letters}({letters}|{d}|_)* {return tok(sym.ID, yytext());}
+
+<STRING> . {string.append(yytext());}
 
 . { err("Illegal character: " + yytext()); }
