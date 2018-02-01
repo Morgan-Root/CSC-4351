@@ -108,7 +108,7 @@ StringBuffer string = new StringBuffer();
 <YYINITIAL> [a-zA-Z][a-zA-Z0-9_]* { return tok(sym.ID, yytext());}
 
 <STRING> \" { yybegin(YYINITIAL); return tok(sym.STRING, string.toString());}
-<STRING> \n|\r\n { err("Error parsing string" + " \"" + string.toString() + "\""); yybegin(YYINITIAL); newline(); return tok(sym.STRING,  string.toString());}
+<STRING> \n|\r\n { err("Error parsing string" + " \"" + string.toString() + "\""); yybegin(YYINITIAL); newline(); return tok(sym.STRING, string.toString());}
 <STRING> [^\n\r\"\\]+ {string.append(yytext());}
 <STRING> \\t {string.append('\t');}
 <STRING> \\n {string.append('\n');}
