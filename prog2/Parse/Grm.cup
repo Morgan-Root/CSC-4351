@@ -128,3 +128,126 @@ Var ::=   ID:n
 	  {: RESULT = sub; :}
 	;
 	
+ExpList ::= 
+	  {: RESULT = null; :}
+	| Exp: e 
+          {: RESULT = new Absyn.ExpList(e, null); :}
+	| seqExp:s
+	  {: RESULT = s; :}
+	;
+	
+fieldVar ::=
+	Var:v DOT:d ID:n
+	  {: RESULT = new Absyn.FieldVar(dleft,v,sym(n)); :}
+	;
+
+subscriptVar ::= 
+	ID:n LBRACK:lb Exp:e RBRACK
+          {: RESULT = new Absyn.SubscriptVar(lbleft, new Absyn.SimpleVar(nleft,sym(n)),e); :}
+	| fieldVar:fv LBRACK:lb Exp:e RBRACK
+	  {: RESULT = new Absyn.SubscriptVar(lbleft,fv,e); :}
+	| subscriptVar:sv LBRACK:lb Exp:e RBRACK
+	  {: RESULT = new Absyn.SubscriptVar(lbleft,sv,e); :}
+	;
+
+decList ::=
+	Dec:d
+	  {: RESULT = new Absyn.DecList(d,null); :}
+	| Dec:d decList:dl
+	  {: RESULT = new Absyn.DecList(d,dl); :}
+	;
+	
+Dec ::=
+	error
+	| functionDec:f
+	  {: RESULT = f; :}
+	| VAR:v ID:n nameType:nt ASSIGN Exp:e
+	  {: RESULT = new Absyn.VarDec(vleft,sym(n),nt,e); :}
+	| typeDec:t
+	  {: RESULT = t; :}
+	;
+	
+Args ::=
+	| Exp:e optArguments:args
+	  {: RESULT = new Absyn.ExpList(e, args); :}
+	;
+
+optArguments ::=
+	error
+	|
+	  {: RESULT = null; :}
+	| COMMA Exp:e optArguments:args
+	  {: RESULT = new Absyn.ExpList(e, args); :}
+	;
+	
+fieldExps ::=
+	error
+	|
+	| ID:n EQ:eq Exp:e optFieldExps: of
+	  {: RESULT = new Absyn.FieldExpList(eqleft, sym(n), e, of); :}
+	;	
+
+optFieldExps ::=
+	error
+	|
+	| COMMA:c ID:n Exp:e optFieldExps: of
+	  {: RESULT = new Absyn.FieldExpList(cleft, sym(n), e, of); :}
+	;
+
+seqExp ::=
+        Exp:e SEMICOLON seqTail:s
+           {: RESULT = new Absyn.ExpList(e,s); :}
+        ;
+
+seqTail ::=
+        Exp:e
+          {: RESULT = new Absyn.ExpList(e,null); :}
+        | seqExp: s
+          {: RESULT = s; :}
+        ;
+
+functionDec ::=
+	FUNCTION:fun ID:n LPAREN Fields:f RPAREN nameType:Nt EQ Exp:e optFunctions:of
+	  {: RESULT = new Absyn.FunctionDec(funleft,sym(n),f,Nt,e,of); :}
+	;
+
+optFunctions ::=
+	| functionDec: fd
+	  {: RESULT = fd; :}
+	;
+	
+typeDec ::=
+	TYPE:t1 ID:n EQ:eq type:t2 optTypes:t3
+	  {: RESULT = new Absyn.TypeDec(t1left,sym(n), t2, t3); :}
+	;
+
+optTypes ::=
+	| typeDec: td
+	  {: RESULT = td; :}
+	;
+
+Fields ::=
+	error
+	|
+	| ID:n1 COLON:c ID:n2 optFields:of
+	  {: RESULT = new Absyn.FieldList(cleft, sym(n1), sym(n2), of); :}
+	;
+
+nameType ::=
+	error
+	|
+	| COLON:c ID:n
+	  {: RESULT = new Absyn.NameTy(cleft, sym(n)); :}
+	;
+	
+Type ::=
+	ID:n
+	{: RESULT = new Absyn.NameTy(nleft, sym(n)); :}
+	| LBRACE:lb fields:f RBRACE
+	{: RESULT = new Absyn.RecordTy(lbleft, f); :}
+	| ARRAY:a OF ID:n
+	{: RESULT = new Absyn.ArrayTy(aleft, sym(n)); :}
+	;
+
+empty ::=
+	;
