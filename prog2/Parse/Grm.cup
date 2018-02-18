@@ -47,7 +47,7 @@ non terminal Absyn.Ty		Type;
 non terminal Absyn.NameTy	nameType;
 non terminal Absyn.FieldList	Fields, optFields;
 non terminal Absyn.FieldExpList fieldExps, optFieldExps;
-non terminal empty;
+non terminal Empty;
 
 precedence nonassoc THEN;
 precedence nonassoc ELSE;
@@ -217,7 +217,7 @@ optFunctions ::=
 	;
 	
 typeDec ::=
-	TYPE:t1 ID:n EQ:eq type:t2 optTypes:t3
+	TYPE:t1 ID:n EQ:eq Type:t2 optTypes:t3
 	  {: RESULT = new Absyn.TypeDec(t1left,sym(n), t2, t3); :}
 	;
 
@@ -243,11 +243,11 @@ nameType ::=
 Type ::=
 	ID:n
 	{: RESULT = new Absyn.NameTy(nleft, sym(n)); :}
-	| LBRACE:lb fields:f RBRACE
+	| LBRACE:lb Fields:f RBRACE
 	{: RESULT = new Absyn.RecordTy(lbleft, f); :}
 	| ARRAY:a OF ID:n
 	{: RESULT = new Absyn.ArrayTy(aleft, sym(n)); :}
 	;
 
-empty ::=
+Empty ::=
 	;
