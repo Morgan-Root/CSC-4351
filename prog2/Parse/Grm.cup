@@ -129,7 +129,7 @@ Var ::=   ID:n
 	;
 	
 ExpList ::= 
-	  {: RESULT = null; :}
+	  Empty
 	| Exp: e 
           {: RESULT = new Absyn.ExpList(e, null); :}
 	| seqExp:s
